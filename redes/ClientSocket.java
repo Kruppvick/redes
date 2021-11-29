@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-public class ClientSocket {
+public class ClientSocket implements Cloneable {
 
     private final Socket socket;
     private final BufferedReader in;
