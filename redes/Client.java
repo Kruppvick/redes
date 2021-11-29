@@ -5,12 +5,25 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class Client implements Runnable {
 
-	  private static final String SERVER_ADDRESS = "127.0.0.1";
-	  private Socket clientSocket;
-	  private Scanner scanner;
-	  private PrintWriter out;
+	private static final String SERVER_ADDRESS = "127.0.0.1";
+	private ClientSocket clientSocket;
+	private Scanner scanner;
+	private PrintWriter out;
+
+	public static void main(String[] args) {
+
+		try {
+			Client client = new Client();
+			client.start();
+		} catch (IOException e) {
+			System.out.println("CLiente não iniciado");
+		}
+
+		//System.out.println("Cliente finalizado");
+	}
+
 
 	  public Client() {
 
@@ -18,12 +31,15 @@ public class Client {
 	  }
 
 	  public void start() throws IOException {
-	  	clientSocket = new Socket(SERVER_ADDRESS, Server.PORTA);
+	  	Socket socket = new Socket(SERVER_ADDRESS, Server.PORTA);
+	  	clientSocket = new ClientSocket(socket);
+
 
 		  System.out.println("Cliente conectado no servidor " + SERVER_ADDRESS + " na porta: " + Server.PORTA);
 
-
+		  new Thread((Runnable) this).start();
 		  loopDeMensagem();
+
 	  }
 
 	  private void loopDeMensagem() throws IOException {
@@ -31,21 +47,17 @@ public class Client {
 	  		do {
 				System.out.print("Digite sua mensagem, ou escreva |sair| para finalizar: ");
 						mensagem = scanner.nextLine();
-						out.println(mensagem);
-			} while (!mensagem.equalsIgnoreCase("sair"));
-
+						clientSocket.enviaMensagem(mensagem);
+			} while (!"sair".equalsIgnoreCase(mensagem));
+	  		clientSocket.fechar();
+	  }
+	  @Override
+	public void run() {
+		String mensagem;
+		while ((mensagem = clientSocket.recebeMensagem())!=null) {
+			System.out.println("Servidor diz " + mensagem);
+		}
 	  }
 
-	  public static void main(String[] args) {
-
-		  try {
-			  Client client = new Client();
-			  client.start();
-		  } catch (IOException e) {
-			  System.out.println("CLiente não iniciado");
-		  }
-
-		  System.out.println("Cliente finalizado");
-	  }
 
 }

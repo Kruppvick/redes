@@ -16,18 +16,8 @@ public class ClientSocket {
     public ClientSocket(Socket socket) throws IOException {
         this.socket = socket;
         System.out.println("Cliente " + socket.getRemoteSocketAddress() + " conectou");
-
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new PrintWriter(socket.getOutputStream(), true);
-
-    }
-
-    public String recebeMensagem() {
-        try {
-            return in.readLine();
-        } catch (IOException e) {
-           return null;
-        }
 
     }
 
@@ -37,9 +27,15 @@ public class ClientSocket {
 
     }
 
-    public SocketAddress getRemoteSocketAddress() {
-        return socket.getRemoteSocketAddress();
+    public String recebeMensagem() {
+        try {
+            return in.readLine();
+        } catch (IOException e) {
+            return null;
+        }
+
     }
+
 
     public void fechar() {
 
@@ -52,6 +48,12 @@ public class ClientSocket {
         }
     }
 
+    public boolean isOpen() {
+        return !socket.isClosed();
+    }
 
+    public SocketAddress getRemoteSocketAddress() {
+        return socket.getRemoteSocketAddress();
+    }
 
 }
