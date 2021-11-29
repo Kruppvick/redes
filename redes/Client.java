@@ -1,6 +1,8 @@
-package redes;
+//package redes;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -13,25 +15,23 @@ public class Client {
 	  private PrintWriter out;
 
 	  public Client() {
-
-	  	scanner = new Scanner(System.in);
+		scanner = new Scanner(System.in);
 	  }
 
 	  public void start() throws IOException {
-	  	clientSocket = new Socket(SERVER_ADDRESS, Server.PORTA);
-
-		  System.out.println("Cliente conectado no servidor " + SERVER_ADDRESS + " na porta: " + Server.PORTA);
-
-
-		  loopDeMensagem();
+		clientSocket = new Socket(SERVER_ADDRESS, Server.PORTA);
+		this.out = new BufferedWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
+		System.out.println("Cliente conectado no servidor " + SERVER_ADDRESS + " na porta: " + Server.PORTA);
+		loopDeMensagem();
 	  }
 
 	  private void loopDeMensagem() throws IOException {
-	  		String mensagem;
-	  		do {
-				System.out.print("Digite sua mensagem, ou escreva |sair| para finalizar: ");
-						mensagem = scanner.nextLine();
-						out.println(mensagem);
+	  	String mensagem;
+	  	do {
+			System.out.print("Digite sua mensagem, ou escreva |sair| para finalizar: ");
+			mensagem = scanner.nextLine();
+			out.write(mensagem);
+			out.newLine();
 			} while (!mensagem.equalsIgnoreCase("sair"));
 
 	  }
@@ -41,8 +41,8 @@ public class Client {
 		  try {
 			  Client client = new Client();
 			  client.start();
-		  } catch (IOException e) {
-			  System.out.println("CLiente não iniciado");
+		  } catch (IOException ex) {
+			  System.out.println("Erro, CLiente não iniciado" + ex.getMessage());
 		  }
 
 		  System.out.println("Cliente finalizado");
